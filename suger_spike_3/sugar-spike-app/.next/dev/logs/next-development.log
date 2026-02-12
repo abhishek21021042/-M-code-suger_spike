@@ -1,0 +1,64 @@
+[00:00:03.033] Server  WARN    ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:03.292] Server  LOG     ✓ Ready in 2.5s
+[00:01:30.976] Server  LOG     ○ Compiling / ...
+[00:01:36.177] Server  ERROR   ⨯ TurbopackInternalError: Failed to write page endpoint /_app
+
+Caused by:
+- byte index 22 is not a char boundary; it is inside 'ン' (bytes 21..24) of `OneDrive_ドキュメント_GitHub_-M-code-suger_spike_suger_spike_sugar-spike-app_pages__app_2da965e7`
+
+Debug info:
+- Execution of get_written_endpoint_with_issues_operation failed
+- Execution of endpoint_write_to_disk failed
+- Execution of <PageEndpoint as Endpoint>::output failed
+- Failed to write page endpoint /_app
+- Execution of all_server_paths failed
+- Execution of server_path failed
+- Execution of <BrowserChunkingContext as ChunkingContext>::chunk_path failed
+- Execution of AssetIdent::output_name failed
+- byte index 22 is not a char boundary; it is inside 'ン' (bytes 21..24) of `OneDrive_ドキュメント_GitHub_-M-code-suger_spike_suger_spike_sugar-spike-app_pages__app_2da965e7`
+[00:01:36.187] Server  ERROR   TurbopackInternalError: Failed to write app endpoint /page
+
+Caused by:
+- byte index 11 is not a char boundary; it is inside 'ド' (bytes 9..12) of `OneDrive_ドキュメント_GitHub_-M-code-suger_spike_suger_spike_sugar-spike-app_a0ff3932`
+
+Debug info:
+- Execution of get_written_endpoint_with_issues_operation failed
+- Execution of endpoint_write_to_disk failed
+- Execution of <AppEndpoint as Endpoint>::output failed
+- Failed to write app endpoint /page
+- Execution of all_server_paths failed
+- Execution of all_assets_from_entries failed
+- Execution of <BuildManifest as OutputAssetsReference>::references failed
+- Execution of <BrowserChunkingContext as ChunkingContext>::chunk_path failed
+- Execution of AssetIdent::output_name failed
+- byte index 11 is not a char boundary; it is inside 'ド' (bytes 9..12) of `OneDrive_ドキュメント_GitHub_-M-code-suger_spike_suger_spike_sugar-spike-app_a0ff3932`
+[00:01:36.192] Server  ERROR   ⨯ TurbopackInternalError: Failed to write page endpoint /_app
+
+Caused by:
+- byte index 22 is not a char boundary; it is inside 'ン' (bytes 21..24) of `OneDrive_ドキュメント_GitHub_-M-code-suger_spike_suger_spike_sugar-spike-app_pages__app_2da965e7`
+
+Debug info:
+- Execution of get_written_endpoint_with_issues_operation failed
+- Execution of endpoint_write_to_disk failed
+- Execution of <PageEndpoint as Endpoint>::output failed
+- Failed to write page endpoint /_app
+- Execution of all_server_paths failed
+- Execution of server_path failed
+- Execution of <BrowserChunkingContext as ChunkingContext>::chunk_path failed
+- Execution of AssetIdent::output_name failed
+- byte index 22 is not a char boundary; it is inside 'ン' (bytes 21..24) of `OneDrive_ドキュメント_GitHub_-M-code-suger_spike_suger_spike_sugar-spike-app_pages__app_2da965e7`
+[00:01:36.195] Server  ERROR   TurbopackInternalError: Failed to write page endpoint /_app
+
+Caused by:
+- byte index 22 is not a char boundary; it is inside 'ン' (bytes 21..24) of `OneDrive_ドキュメント_GitHub_-M-code-suger_spike_suger_spike_sugar-spike-app_pages__app_2da965e7`
+
+Debug info:
+- Execution of get_written_endpoint_with_issues_operation failed
+- Execution of endpoint_write_to_disk failed
+- Execution of <PageEndpoint as Endpoint>::output failed
+- Failed to write page endpoint /_app
+- Execution of all_server_paths failed
+- Execution of server_path failed
+- Execution of <BrowserChunkingContext as ChunkingContext>::chunk_path failed
+- Execution of AssetIdent::output_name failed
+- byte index 22 is not a char boundary; it is inside 'ン' (bytes 21..24) of `OneDrive_ドキュメント_GitHub_-M-code-suger_spike_suger_spike_sugar-spike-app_pages__app_2da965e7`
