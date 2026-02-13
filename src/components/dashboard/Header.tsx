@@ -13,10 +13,15 @@ type HeaderProps = {
 };
 
 export default function Header({ hideXPBar = false }: HeaderProps) {
-    const { xp, streak, level, theme, toggleTheme, setOverlayActive } = useOnboardingStore();
+    const { xp, streak, level, setOverlayActive } = useOnboardingStore();
     const [showVoice, setShowVoice] = useState(false);
     const [showPhoto, setShowPhoto] = useState(false);
     const [showReport, setShowReport] = useState(false);
+    const [showStreakInfo, setShowStreakInfo] = useState(false);
+
+    // Calculate current streak bonus
+    const streakBonus = (streak > 7) ? 7 : (streak > 3) ? 2 : 0;
+    const nextMilestone = (streak <= 3) ? 4 : (streak <= 7) ? 8 : null;
 
     // Toggle overlay state when loggers open/close
     const handleVoiceOpen = () => { setShowVoice(true); setOverlayActive(true); };
@@ -30,12 +35,63 @@ export default function Header({ hideXPBar = false }: HeaderProps) {
             initial={{ y: -30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full flex flex-col gap-5"
+            className="w-full flex flex-col gap-5 relative"
         >
             <AnimatePresence>
                 {showVoice && <VoiceLogger onClose={handleVoiceClose} />}
                 {showPhoto && <PhotoLogger onClose={handlePhotoClose} />}
                 {showReport && <WeeklyReport onClose={() => setShowReport(false)} />}
+
+                {showStreakInfo && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowStreakInfo(false)}
+                            className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-[2px]"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                            className="absolute top-12 right-0 z-[110] w-56 p-4 rounded-2xl bg-[#1e1e1e] border border-orange-500/30 shadow-[0_0_30px_rgba(249,115,22,0.15)]"
+                        >
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-xl">
+                                    🔥
+                                </div>
+                                <div>
+                                    <h4 className="text-white font-black text-sm uppercase italic tracking-tight">Streak Status</h4>
+                                    <p className="text-[10px] text-orange-400 font-bold uppercase tracking-widest">{streak} Day Streak</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="p-2 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between font-bold">
+                                    <span className="text-[10px] text-white/40 uppercase">Current Bonus</span>
+                                    <span className="text-brand-teal text-xs">+{streakBonus} XP / Log</span>
+                                </div>
+
+                                {nextMilestone && (
+                                    <div className="p-2 rounded-xl bg-orange-500/5 border border-orange-500/10 flex flex-col gap-1">
+                                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-tight">
+                                            <span className="text-white/40">Next Milestone</span>
+                                            <span className="text-orange-400">{nextMilestone} Days</span>
+                                        </div>
+                                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-orange-500 rounded-full"
+                                                style={{ width: `${(streak / nextMilestone) * 100}%` }}
+                                            />
+                                        </div>
+                                        <p className="text-[9px] text-white/30 italic">Reach {nextMilestone} days for increased XP bonus!</p>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
             </AnimatePresence>
 
             {/* Row 1: Greeting + Streak */}
@@ -49,13 +105,11 @@ export default function Header({ hideXPBar = false }: HeaderProps) {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button
-                        onClick={toggleTheme}
-                        className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center active:scale-90 transition-all text-brand-teal hover:bg-white/[0.08]"
+
+                    <div
+                        onClick={() => setShowStreakInfo(!showStreakInfo)}
+                        className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500/10 to-amber-500/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-orange-500/20 cursor-pointer active:scale-95 transition-all hover:bg-orange-500/20"
                     >
-                        <span className="material-icons text-lg">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
-                    </button>
-                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500/10 to-amber-500/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-orange-500/20">
                         <span className="text-base">🔥</span>
                         <span className="font-extrabold text-sm text-orange-400">{streak}</span>
                     </div>
@@ -66,17 +120,19 @@ export default function Header({ hideXPBar = false }: HeaderProps) {
             <div className="flex gap-2">
                 <button
                     onClick={handleVoiceOpen}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-gradient-to-r from-brand-teal to-brand-teal-light text-bg-base font-bold text-xs shadow-lg shadow-brand-teal/15 active:scale-[0.97] transition-transform"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-gradient-to-r from-brand-teal to-brand-teal-light text-bg-base font-bold text-xs shadow-lg shadow-brand-teal/15 active:scale-[0.97] transition-transform relative overflow-hidden"
                 >
                     <span className="material-icons text-base">mic</span>
                     Voice
+                    <span className="absolute top-1 right-2 text-[7px] font-black uppercase bg-black/10 px-1 rounded-sm">Beta</span>
                 </button>
                 <button
                     onClick={handlePhotoOpen}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-white/[0.05] border border-white/[0.08] text-white/80 font-bold text-xs active:scale-[0.97] transition-transform hover:bg-white/[0.08]"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-white/[0.05] border border-white/[0.08] text-white/80 font-bold text-xs active:scale-[0.97] transition-transform hover:bg-white/[0.08] relative overflow-hidden"
                 >
                     <span className="material-icons text-base">photo_camera</span>
                     Photo
+                    <span className="absolute top-1 right-2 text-[7px] font-black uppercase text-brand-coral bg-brand-coral/10 px-1 rounded-sm border border-brand-coral/20">Beta</span>
                 </button>
                 <button
                     onClick={() => setShowReport(true)}

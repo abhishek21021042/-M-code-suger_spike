@@ -8,7 +8,9 @@ import Header from '@/components/dashboard/Header';
 import QuickLogGrid from '@/components/dashboard/QuickLogGrid';
 import Timeline from '@/components/dashboard/Timeline';
 import Mascot from '@/components/dashboard/Mascot';
-import SugarMeter from '@/components/dashboard/SugarMeter';
+import Link from "next/link";
+import StatusCard from '@/components/dashboard/StatusCard';
+import MissionList from '@/components/dashboard/MissionList';
 
 export default function Dashboard() {
     const logs = useOnboardingStore((state) => state.logs);
@@ -16,11 +18,12 @@ export default function Dashboard() {
 
     return (
         <>
-            <Header />
+            <Header hideXPBar={true} />
 
             <div className="mt-5 mb-5 space-y-5">
-                <SugarMeter />
+                <StatusCard />
                 <Mascot />
+                <MissionList />
             </div>
 
             <div className="flex-1 flex flex-col gap-6 min-h-0">

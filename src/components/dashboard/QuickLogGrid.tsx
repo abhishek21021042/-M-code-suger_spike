@@ -27,7 +27,7 @@ function getSugarColor(sugar: number) {
 }
 
 export default function QuickLogGrid() {
-    const { addLog, customPresets } = useOnboardingStore();
+    const { proposeLog, customPresets } = useOnboardingStore();
     const [showCustomModal, setShowCustomModal] = useState(false);
 
     // Combine standard presets + custom presets + 'Other' button
@@ -46,7 +46,7 @@ export default function QuickLogGrid() {
             return;
         }
 
-        addLog({
+        proposeLog({
             emoji: item.emoji,
             name: item.name,
             xp: item.xp,

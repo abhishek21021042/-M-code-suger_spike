@@ -5,13 +5,23 @@ export interface RuleContext {
     recentLogsCount?: number; // logs in last 2 hours
 }
 
+export interface Mission {
+    id: string;
+    title: string;
+    description: string;
+    xp: number;
+    type: 'physical' | 'hydration' | 'nutritional';
+    icon: string;
+}
+
 export interface Insight {
     type: 'warning' | 'info' | 'success';
     message: string;
     reason: string;
     action: string;
-    explanation: string; // The "Science" behind the tip
+    explanation: string;
     xpBonus: number;
+    mission?: Mission;
 }
 
 export const calculateXP = (baseXP: number, context: RuleContext): number => {
@@ -42,7 +52,15 @@ export const generateInsight = (itemName: string, context: RuleContext): Insight
             reason: "Multiple sugar sources in a short window create a massive insulin spike.",
             explanation: "Insulin sensitivity drops when the pancreas is forced to work continuously without a break. Stacking leads to fat storage and energy crashes.",
             action: "Skip the next sweet treat for 4 hours.",
-            xpBonus: 15
+            xpBonus: 15,
+            mission: {
+                id: `mission-stack-${Date.now()}`,
+                title: "Run 1km",
+                description: "Burn off that stacked glucose with a quick run.",
+                xp: 25,
+                type: 'physical',
+                icon: 'directions_run'
+            }
         };
     }
 
@@ -54,7 +72,15 @@ export const generateInsight = (itemName: string, context: RuleContext): Insight
             reason: "Sugar before bed can reduce sleep quality.",
             explanation: "Digesting simple sugars at night raises your core body temperature and inhibits the release of Growth Hormone, which is essential for overnight repair.",
             action: "Drink water to dilute the spike.",
-            xpBonus: 5
+            xpBonus: 5,
+            mission: {
+                id: `mission-night-${Date.now()}`,
+                title: "Hydration Hero",
+                description: "Drink 500ml water to help your body process the sugar.",
+                xp: 15,
+                type: 'hydration',
+                icon: 'water_drop'
+            }
         };
     }
 
@@ -66,7 +92,15 @@ export const generateInsight = (itemName: string, context: RuleContext): Insight
             reason: "Your body might be craving quick energy.",
             explanation: "The afternoon glycemic crash is often mistaken for hunger. Simple sugars give a 20-min buzz followed by a deeper fatigue.",
             action: "Take a 10-min walk to burn it off.",
-            xpBonus: 10
+            xpBonus: 10,
+            mission: {
+                id: `mission-walk-${Date.now()}`,
+                title: "Brisk Walk",
+                description: "Defeat the afternoon slump with a 10-min brisk walk.",
+                xp: 20,
+                type: 'physical',
+                icon: 'directions_walk'
+            }
         };
     }
 

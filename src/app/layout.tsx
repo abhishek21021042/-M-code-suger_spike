@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import ThemeProvider from '@/components/ThemeProvider';
+import AuthProvider from '@/components/providers/AuthProvider';
 import "./globals.css";
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 
@@ -33,9 +34,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={plusJakarta.className}>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

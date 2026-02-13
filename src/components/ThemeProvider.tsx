@@ -4,7 +4,6 @@ import { useOnboardingStore } from '@/lib/store';
 import { useEffect, useState } from 'react';
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const theme = useOnboardingStore((state) => state.theme);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -13,9 +12,8 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
     useEffect(() => {
         if (!mounted) return;
-        const currentTheme = theme || 'dark';
-        document.documentElement.setAttribute('data-theme', currentTheme);
-    }, [theme, mounted]);
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }, [mounted]);
 
     // Prevent hydration mismatch by rendering nothing until mounted, 
     // OR just render children and accept flash?

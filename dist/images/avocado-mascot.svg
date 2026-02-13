@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <!-- Body -->
+  <ellipse cx="100" cy="130" rx="70" ry="90" fill="url(#bodyGrad)"/>
+  <!-- Pit -->
+  <ellipse cx="100" cy="150" rx="35" ry="40" fill="url(#pitGrad)"/>
+  <!-- Eyes -->
+  <ellipse cx="80" cy="105" rx="10" ry="12" fill="white"/>
+  <ellipse cx="120" cy="105" rx="10" ry="12" fill="white"/>
+  <ellipse cx="82" cy="107" rx="5" ry="6" fill="#2D3748"/>
+  <ellipse cx="122" cy="107" rx="5" ry="6" fill="#2D3748"/>
+  <!-- Eye shine -->
+  <circle cx="84" cy="104" r="2" fill="white"/>
+  <circle cx="124" cy="104" r="2" fill="white"/>
+  <!-- Mouth -->
+  <path d="M88 125 Q100 138 112 125" stroke="#2D3748" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <ellipse cx="70" cy="120" rx="10" ry="7" fill="#FFB4B4" opacity="0.5"/>
+  <ellipse cx="130" cy="120" rx="10" ry="7" fill="#FFB4B4" opacity="0.5"/>
+  <!-- Left Arm -->
+  <path d="M35 130 Q20 115 25 100" stroke="#6B8E4E" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Right Arm (waving) -->
+  <path d="M165 130 Q180 100 170 80" stroke="#6B8E4E" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Left Leg -->
+  <path d="M75 215 Q70 235 60 240" stroke="#6B8E4E" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Right Leg -->
+  <path d="M125 215 Q130 235 140 240" stroke="#6B8E4E" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Stem -->
+  <path d="M100 42 Q105 25 110 15" stroke="#5D7B3A" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="115" cy="15" rx="8" ry="5" fill="#7CB342" transform="rotate(-20, 115, 15)"/>
+  <defs>
+    <radialGradient id="bodyGrad" cx="0.4" cy="0.3" r="0.7">
+      <stop offset="0%" stop-color="#A8D86E"/>
+      <stop offset="70%" stop-color="#7CB342"/>
+      <stop offset="100%" stop-color="#558B2F"/>
+    </radialGradient>
+    <radialGradient id="pitGrad" cx="0.45" cy="0.4" r="0.6">
+      <stop offset="0%" stop-color="#D4A373"/>
+      <stop offset="60%" stop-color="#A67B4B"/>
+      <stop offset="100%" stop-color="#8B5E34"/>
+    </radialGradient>
+  </defs>
+</svg>

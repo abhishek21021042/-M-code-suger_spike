@@ -1,8 +1,10 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { calculateXP, generateInsight, Insight, RuleContext } from './rulesEngine';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { calculateXP, generateInsight, Insight, RuleContext, Mission } from './rulesEngine';
 import { syncUserToSupabase } from './auth';
 import { syncLogToSupabase } from './db';
+import { supabase } from './supabase';
+import { User } from '@supabase/supabase-js';
 
 export interface Badge {
     id: string;
@@ -10,7 +12,25 @@ export interface Badge {
     description: string;
     icon: string;
     criteria: string;
+    bonusXP: number;
 }
+
+export const ALL_BADGES: Badge[] = [
+    { id: 'first-log', name: 'First Step', description: 'Log your first sugar item to start your journey.', icon: 'auto_awesome', criteria: 'Log 1 item', bonusXP: 50 },
+    { id: 'streak-3', name: 'Consistent', description: 'Maintain a 3-day metabolic tracking streak.', icon: 'local_fire_department', criteria: '3-day streak', bonusXP: 100 },
+    { id: 'night-owl', name: 'Night Owl', description: 'Logged sugar late at night? Accountability is key.', icon: 'dark_mode', criteria: 'Log after 8 PM', bonusXP: 50 },
+    { id: 'sugar-slayer', name: 'Sugar Slayer', description: 'Logged 10 sugar items. You are gaining awareness.', icon: 'security', criteria: 'Log 10 items', bonusXP: 150 },
+    { id: 'early-bird', name: 'Early Bird', description: 'Log sugar before 9 AM to stay on track all day.', icon: 'wb_sunny', criteria: 'Log before 9 AM', bonusXP: 50 },
+    { id: 'weekend-warrior', name: 'Weekend Warrior', description: 'Stayed consistent during the weekend.', icon: 'celebration', criteria: 'Log on Sat & Sun', bonusXP: 200 },
+    { id: 'visionary', name: 'Visionary', description: 'Logged 5 items using AI Camera Vision.', icon: 'photo_camera', criteria: '5 Photo Logs', bonusXP: 100 },
+    { id: 'voice-log', name: 'Voice Pilot', description: 'Logged 5 items using Voice Analysis.', icon: 'mic', criteria: '5 Voice Logs', bonusXP: 100 },
+    { id: 'sugar-free-day', name: 'Pure Day', description: 'Logged 0.0g sugar for a full 24-hour cycle.', icon: 'verified', criteria: 'No sugar for 24h', bonusXP: 300 },
+    { id: 'streak-14', name: 'Elite Slayer', description: 'Your discipline is legendary. 14 days and counting.', icon: 'workspace_premium', criteria: '14-day streak', bonusXP: 500 },
+    { id: 'ninja', name: 'Sugar Ninja', description: 'Logged 3+ sugar-free items in a single day.', icon: 'visibility_off', criteria: '3 Sugar-Free Logs/Day', bonusXP: 250 },
+    { id: 'marathoner', name: 'Marathoner', description: '50 items logged. You are a true data scientist of your own health.', icon: 'speed', criteria: '50 Total Logs', bonusXP: 400 },
+    { id: 'photo-master', name: 'Art Collector', description: '15 items logged using AI Vision. You see what others miss.', icon: 'camera', criteria: '15 Photo Logs', bonusXP: 300 },
+    { id: 'voice-master', name: 'Voice Oracle', description: '15 items logged using Voice Analysis. Commands respect.', icon: 'record_voice_over', criteria: '15 Voice Logs', bonusXP: 300 }
+];
 
 export interface LogEntry {
     id: string;
@@ -19,6 +39,7 @@ export interface LogEntry {
     xp: number;
     sugar?: number;
     timestamp: string; // ISO string
+    source?: 'quick' | 'photo' | 'voice';
 }
 
 interface OnboardingState {
@@ -33,9 +54,13 @@ interface OnboardingState {
     xp: number;
     level: number;
     logs: LogEntry[];
-    theme: 'dark' | 'light';
+
+    // Auth State
+    user: User | null;
+    setUser: (user: User | null) => void;
 
     // Insight State
+    pendingLog: (Omit<LogEntry, 'id' | 'timestamp'> & { calculatedXP: number }) | null;
     latestInsight: Insight | null;
     insightHistory: Insight[];
     showInsight: boolean;
@@ -44,14 +69,13 @@ interface OnboardingState {
     unlockedBadgeIds: string[];
     badges: Badge[];
 
+    // Mission System
+    activeMissions: Mission[];
+
     // Custom Presets
     customPresets: { id: string; emoji: string; name: string; xp: number; sugar: number }[];
     addCustomPreset: (preset: { emoji: string; name: string; xp: number; sugar: number }) => void;
     deleteCustomPreset: (id: string) => void;
-
-    // Action Tracking
-    pendingActionId: string | null;
-    actionCompletionHistory: { id: string; completedAt: string }[];
 
     // UI State
     isOverlayActive: boolean;
@@ -63,19 +87,20 @@ interface OnboardingState {
     setWeight: (weight: number) => void;
     setGender: (gender: string) => void;
 
-    toggleTheme: () => void;
-    addLog: (entry: Omit<LogEntry, 'id' | 'timestamp'>) => void;
+    proposeLog: (entry: Omit<LogEntry, 'id' | 'timestamp'>) => void;
+    commitLog: () => void;
+    cancelLog: () => void;
     dismissInsight: () => void;
     deleteLog: (id: string) => void;
     unlockBadge: (badgeId: string) => void;
-    completeAction: (actionId: string) => void;
+    completeMission: (missionId: string) => void;
     setOverlayActive: (isActive: boolean) => void;
     reset: () => void;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             age: 25,
             height: 170,
             weight: 70,
@@ -85,71 +110,77 @@ export const useOnboardingStore = create<OnboardingState>()(
             xp: 120,   // Default cheat
             level: 1,
             logs: [],
-            theme: 'dark',
+
+            user: null,
+            setUser: (user: User | null) => set({ user }),
+
             latestInsight: null,
+            pendingLog: null,
             insightHistory: [],
             showInsight: false,
 
             unlockedBadgeIds: [],
-            badges: [
-                { id: 'first-log', name: 'First Step', description: 'Log your first sugar item', icon: 'auto_awesome', criteria: 'Log 1 item' },
-                { id: 'streak-3', name: 'Consistent', description: 'Reach a 3-day streak', icon: 'local_fire_department', criteria: '3-day streak' },
-                { id: 'night-owl', name: 'Night Owl', description: 'Log sugar after 8 PM', icon: 'dark_mode', criteria: 'Log after 8 PM' },
-                { id: 'sugar-slayer', name: 'Sugar Slayer', description: 'Log 10 items total', icon: 'security', criteria: 'Log 10 items' },
-                { id: 'early-bird', name: 'Early Bird', description: 'Log sugar before 9 AM', icon: 'wb_sunny', criteria: 'Log before 9 AM' }
-            ],
+            badges: ALL_BADGES,
 
-            pendingActionId: null,
-            actionCompletionHistory: [],
+            activeMissions: [],
 
             isOverlayActive: false,
-            setOverlayActive: (isActive) => set({ isOverlayActive: isActive }),
+            setOverlayActive: (isActive: boolean) => set({ isOverlayActive: isActive }),
 
             customPresets: [],
-            addCustomPreset: (preset) => set((state) => ({
+            addCustomPreset: (preset: { emoji: string; name: string; xp: number; sugar: number }) => set((state: OnboardingState) => ({
                 customPresets: [...state.customPresets, { ...preset, id: crypto.randomUUID() }]
             })),
-            deleteCustomPreset: (id) => set((state) => ({
-                customPresets: state.customPresets.filter(p => p.id !== id)
+            deleteCustomPreset: (id: string) => set((state: OnboardingState) => ({
+                customPresets: state.customPresets.filter((p: { id: string; emoji: string; name: string; xp: number; sugar: number }) => p.id !== id)
             })),
 
-            setAge: (age) => { set({ age }); syncUserToSupabase({ age }); },
-            setHeight: (height) => { set({ height }); syncUserToSupabase({ height }); },
-            setWeight: (weight) => { set({ weight }); syncUserToSupabase({ weight }); },
-            setGender: (gender) => { set({ gender }); syncUserToSupabase({ gender }); },
+            setAge: (age: number) => { set({ age }); syncUserToSupabase({ age }); },
+            setHeight: (height: number) => { set({ height }); syncUserToSupabase({ height }); },
+            setWeight: (weight: number) => { set({ weight }); syncUserToSupabase({ weight }); },
+            setGender: (gender: string) => { set({ gender }); syncUserToSupabase({ gender }); },
 
-            toggleTheme: () => set((state) => ({
-                theme: state.theme === 'light' ? 'dark' : 'light'
-            })),
 
             dismissInsight: () => set({ showInsight: false }),
 
-            addLog: (entry) => set((state) => {
+            proposeLog: (entry) => set((state) => {
                 const now = new Date();
-
-                // Calculate logs in last 2 hours for stacking rule
                 const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
                 const recentLogsCount = state.logs.filter(l => new Date(l.timestamp) > twoHoursAgo).length;
 
                 const context: RuleContext = {
                     timeOfDay: now.getHours(),
                     streak: state.streak,
-                    sugarAmount: entry.sugar ?? 20, // Use provided sugar amount or fallback
+                    sugarAmount: entry.sugar ?? 20,
                     recentLogsCount
                 };
 
-                // 1. Calculate XP with bonuses
-                const calculatedXP = calculateXP(entry.xp, context); // entry.xp is base
-
-                // 2. Generate Insight
+                const calculatedXP = calculateXP(entry.xp, context);
                 const insight = generateInsight(entry.name, context);
 
-                const newLog = {
-                    ...entry,
+                return {
+                    pendingLog: { ...entry, calculatedXP },
+                    latestInsight: insight,
+                    showInsight: true
+                };
+            }),
+
+            commitLog: () => set((state) => {
+                if (!state.pendingLog || !state.latestInsight) return state;
+
+                const now = new Date();
+                const newLog: LogEntry = {
+                    emoji: state.pendingLog.emoji,
+                    name: state.pendingLog.name,
+                    xp: state.pendingLog.calculatedXP,
+                    sugar: state.pendingLog.sugar,
+                    source: state.pendingLog.source || 'quick',
                     id: crypto.randomUUID(),
                     timestamp: now.toISOString(),
-                    xp: calculatedXP,
                 };
+
+                const insight = state.latestInsight;
+                const calculatedXP = state.pendingLog.calculatedXP;
 
                 // Sync Log
                 syncLogToSupabase(newLog);
@@ -160,46 +191,87 @@ export const useOnboardingStore = create<OnboardingState>()(
                     last_active: now.toISOString()
                 });
 
-
-
                 // --- Achievement Logic ---
                 const newUnlockedIds = [...state.unlockedBadgeIds];
-                const totalLogs = state.logs.length + 1;
+                const totalLogs = [newLog, ...state.logs];
+                const totalLogsCount = totalLogs.length;
+
+                // Helper to grant badge and add XP
+                let bonusXPGained = 0;
+                const grantBadge = (id: string) => {
+                    if (!newUnlockedIds.includes(id)) {
+                        newUnlockedIds.push(id);
+                        const badge = state.badges.find(b => b.id === id);
+                        if (badge) bonusXPGained += badge.bonusXP;
+                    }
+                };
 
                 // 1. First Log
-                if (!newUnlockedIds.includes('first-log')) {
-                    newUnlockedIds.push('first-log');
+                grantBadge('first-log');
+
+                // 2. Streak Based
+                if (state.streak >= 3) grantBadge('streak-3');
+                if (state.streak >= 14) grantBadge('streak-14');
+
+                // 3. Time Based
+                if (now.getHours() >= 20) grantBadge('night-owl');
+                if (now.getHours() < 9) grantBadge('early-bird');
+
+                // 4. Quantity Based
+                if (totalLogsCount >= 10) grantBadge('sugar-slayer');
+                if (totalLogsCount >= 50) grantBadge('marathoner');
+
+                // 5. Source Based
+                const photoLogs = totalLogs.filter(l => l.source === 'photo').length;
+                const voiceLogs = totalLogs.filter(l => l.source === 'voice').length;
+                if (photoLogs >= 5) grantBadge('visionary');
+                if (photoLogs >= 15) grantBadge('photo-master');
+                if (voiceLogs >= 5) grantBadge('voice-log');
+                if (voiceLogs >= 15) grantBadge('voice-master');
+
+                // 6. Weekend Warrior
+                const hasSat = totalLogs.some(l => new Date(l.timestamp).getDay() === 6);
+                const hasSun = totalLogs.some(l => new Date(l.timestamp).getDay() === 0);
+                if (hasSat && hasSun) grantBadge('weekend-warrior');
+
+                // 7. Sugar Free Day
+                const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                const recentSugarLogs = totalLogs.filter(l => new Date(l.timestamp) > last24h && (l.sugar || 0) > 0);
+                if (recentSugarLogs.length === 0 && totalLogs.some(l => new Date(l.timestamp) > last24h)) {
+                    grantBadge('sugar-free-day');
                 }
 
-                // 2. Night Owl (After 8 PM)
-                if (now.getHours() >= 20 && !newUnlockedIds.includes('night-owl')) {
-                    newUnlockedIds.push('night-owl');
-                }
+                // 8. Sugar Ninja (3 sugar-free logs in CURRENT day)
+                const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const todaysFreeLogs = totalLogs.filter(l => new Date(l.timestamp) >= startOfToday && (l.sugar || 0) === 0).length;
+                if (todaysFreeLogs >= 3) grantBadge('ninja');
 
-                // 3. Early Bird (Before 9 AM)
-                if (now.getHours() < 9 && !newUnlockedIds.includes('early-bird')) {
-                    newUnlockedIds.push('early-bird');
-                }
-
-                // 4. Sugar Slayer (10 total logs)
-                if (totalLogs >= 10 && !newUnlockedIds.includes('sugar-slayer')) {
-                    newUnlockedIds.push('sugar-slayer');
-                }
-
-                const newXP = state.xp + calculatedXP + insight.xpBonus;
+                const totalXPGained = calculatedXP + insight.xpBonus + bonusXPGained;
+                const newXP = state.xp + totalXPGained;
                 const nextLevelXP = 500;
                 const newLevel = Math.floor(newXP / nextLevelXP) + 1;
 
+                const newMissions = [...state.activeMissions];
+                if (insight.mission) {
+                    newMissions.push(insight.mission);
+                }
+
                 return {
-                    logs: [newLog, ...state.logs],
+                    logs: totalLogs,
                     xp: newXP,
                     level: newLevel,
-                    latestInsight: insight,
                     insightHistory: [insight, ...state.insightHistory],
-                    showInsight: true,
                     unlockedBadgeIds: newUnlockedIds,
-                    pendingActionId: insight.action ? `action-${Date.now()}` : null
+                    activeMissions: newMissions,
+                    pendingLog: null,
+                    showInsight: false
                 };
+            }),
+
+            cancelLog: () => set({
+                pendingLog: null,
+                latestInsight: null,
+                showInsight: false
             }),
 
             unlockBadge: (badgeId) => set((state) => ({
@@ -208,16 +280,18 @@ export const useOnboardingStore = create<OnboardingState>()(
                     : [...state.unlockedBadgeIds, badgeId]
             })),
 
-            completeAction: (actionId) => set((state) => {
-                const newXP = state.xp + 25;
+            completeMission: (missionId) => set((state) => {
+                const mission = state.activeMissions.find(m => m.id === missionId);
+                if (!mission) return state;
+
+                const newXP = state.xp + mission.xp;
                 const nextLevelXP = 500;
                 const newLevel = Math.floor(newXP / nextLevelXP) + 1;
 
                 return {
                     xp: newXP,
                     level: newLevel,
-                    pendingActionId: null,
-                    actionCompletionHistory: [...state.actionCompletionHistory, { id: actionId, completedAt: new Date().toISOString() }]
+                    activeMissions: state.activeMissions.filter(m => m.id !== missionId)
                 };
             }),
 
@@ -232,6 +306,16 @@ export const useOnboardingStore = create<OnboardingState>()(
         }),
         {
             name: 'onboarding-storage',
+            partialize: (state: OnboardingState) => {
+                const { user, ...rest } = state;
+                return rest;
+            },
+            onRehydrateStorage: () => (state: OnboardingState | undefined) => {
+                if (state) {
+                    // Force update badge definitions if they changed
+                    state.badges = ALL_BADGES;
+                }
+            }
         }
     )
 );

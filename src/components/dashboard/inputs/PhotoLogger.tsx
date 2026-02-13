@@ -13,7 +13,7 @@ export default function PhotoLogger({ onClose }: { onClose: () => void }) {
     const [detectedItem, setDetectedItem] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const addLog = useOnboardingStore(state => state.addLog);
+    const proposeLog = useOnboardingStore(state => state.proposeLog);
 
     useEffect(() => {
         async function setupCamera() {
@@ -67,7 +67,13 @@ export default function PhotoLogger({ onClose }: { onClose: () => void }) {
 
     const confirmLog = () => {
         if (detectedItem) {
-            addLog(detectedItem);
+            proposeLog({
+                emoji: detectedItem.emoji,
+                name: detectedItem.name,
+                xp: detectedItem.xp || 20,
+                sugar: detectedItem.sugarAmount || 0,
+                source: 'photo',
+            });
             onClose();
         }
     };

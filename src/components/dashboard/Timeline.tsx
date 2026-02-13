@@ -41,20 +41,10 @@ export default function Timeline() {
                                 layout
                                 initial={{ opacity: 0, x: -16 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 50, height: 0, marginBottom: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                                drag="x"
-                                dragConstraints={{ left: -100, right: 0 }}
-                                onDragEnd={(e, { offset }) => {
-                                    if (offset.x < -80) deleteLog(log.id);
-                                }}
                                 className="relative group"
                             >
-                                {/* Delete Background Layer */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-red-500/15 rounded-2xl flex items-center justify-end px-4">
-                                    <span className="material-icons text-red-400/60 text-sm">delete</span>
-                                </div>
-
                                 {/* Front Card */}
                                 <GlassCard className="relative z-10 flex items-center gap-3 p-3 border-white/[0.04] hover:border-white/[0.08] transition-colors">
                                     {/* Timeline dot */}

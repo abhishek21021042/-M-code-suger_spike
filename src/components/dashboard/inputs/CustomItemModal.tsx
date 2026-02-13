@@ -8,7 +8,7 @@ import { useOnboardingStore } from '@/lib/store';
 export default function CustomItemModal({ onClose }: { onClose: () => void }) {
     const [name, setName] = useState('');
     const [sugar, setSugar] = useState('');
-    const { addLog, addCustomPreset } = useOnboardingStore();
+    const { proposeLog, addCustomPreset } = useOnboardingStore();
 
     const handleSave = () => {
         if (!name || !sugar) return;
@@ -25,9 +25,9 @@ export default function CustomItemModal({ onClose }: { onClose: () => void }) {
         addCustomPreset(preset);
 
         // 2. Log it immediately
-        addLog({
+        proposeLog({
             ...preset,
-            // ID and timestamp handled by store
+            source: 'quick'
         });
 
         onClose();
@@ -89,8 +89,8 @@ export default function CustomItemModal({ onClose }: { onClose: () => void }) {
                             onClick={handleSave}
                             disabled={!name || !sugar}
                             className={`w-full py-3.5 rounded-xl font-bold text-bg-base mt-4 transition-all ${name && sugar
-                                    ? 'bg-brand-teal shadow-lg shadow-brand-teal/20 hover:scale-[1.02] active:scale-95'
-                                    : 'bg-white/10 text-white/20 cursor-not-allowed'
+                                ? 'bg-brand-teal shadow-lg shadow-brand-teal/20 hover:scale-[1.02] active:scale-95'
+                                : 'bg-white/10 text-white/20 cursor-not-allowed'
                                 }`}
                         >
                             Save & Log

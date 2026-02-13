@@ -27,20 +27,6 @@
   --shadow-neu-flat: 6px 6px 16px #0a0a10, -6px -6px 16px #1e1e2a;
 }
 
-[data-theme='light'] {
-  --bg-base: #EEF2F6;
-  --bg-neu-light: #FFFFFF;
-  --bg-neu-dark: #D1D9E6;
-  --foreground: #2D3748;
-  --text-secondary: #718096;
-
-  --glass-surface: rgba(255, 255, 255, 0.4);
-  --glass-border: rgba(255, 255, 255, 0.2);
-
-  --shadow-neu-pressed: inset 6px 6px 12px #D1D9E6, inset -6px -6px 12px #FFFFFF;
-  --shadow-neu-flat: 8px 8px 16px #D1D9E6, -8px -8px 16px #FFFFFF;
-}
-
 @theme inline {
   --color-bg-base: var(--bg-base);
   --color-bg-neu-light: var(--bg-neu-light);

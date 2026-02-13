@@ -12,7 +12,7 @@ export default function VoiceLogger({ onClose }: { onClose: () => void }) {
     const [result, setResult] = useState<any>(null);
     const mediaRecorder = useRef<MediaRecorder | null>(null);
     const audioChunks = useRef<Blob[]>([]);
-    const { addLog } = useOnboardingStore();
+    const proposeLog = useOnboardingStore(state => state.proposeLog);
 
     const startRecording = async () => {
         try {
@@ -61,12 +61,12 @@ export default function VoiceLogger({ onClose }: { onClose: () => void }) {
     const handleConfirm = () => {
         if (result && result.items) {
             result.items.forEach((item: any) => {
-                addLog({
+                proposeLog({
                     emoji: item.emoji || '🍽️',
                     name: item.name,
                     xp: 10, // Base XP for voice logs
                     sugar: item.sugar || 0,
-                    // timestamps handled in store
+                    source: 'voice',
                 });
             });
             onClose();
@@ -107,10 +107,10 @@ export default function VoiceLogger({ onClose }: { onClose: () => void }) {
                                     onClick={isRecording ? stopRecording : startRecording}
                                     disabled={isAnalyzing}
                                     className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${isRecording
-                                            ? 'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]'
-                                            : isAnalyzing
-                                                ? 'bg-white/10 animate-pulse'
-                                                : 'bg-brand-teal shadow-[0_0_30px_rgba(78,205,196,0.3)] hover:scale-105'
+                                        ? 'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]'
+                                        : isAnalyzing
+                                            ? 'bg-white/10 animate-pulse'
+                                            : 'bg-brand-teal shadow-[0_0_30px_rgba(78,205,196,0.3)] hover:scale-105'
                                         }`}
                                 >
                                     <span className="material-icons text-3xl text-white">
