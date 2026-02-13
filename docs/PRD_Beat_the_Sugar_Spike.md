@@ -1214,96 +1214,147 @@ GET    /api/actions/pending          # Get pending actions
 
 ## 10. UI/UX Design Guidelines
 
-### 10.1 Design System
+### 10.1 Design System — Modern Glassmorphism
 
 #### Color Palette
-**Primary Colors:**
-- **Brand Primary:** `#FF6B6B` (Energetic coral-red)
-- **Brand Secondary:** `#4ECDC4` (Fresh teal)
-- **Accent:** `#FFE66D` (Warm yellow)
+**Brand Gradients:**
+- **Primary:** `#FF6B6B → #FF3D71` (Coral gradient)
+- **Secondary:** `#4ECDC4 → #0ABAB5` (Teal gradient)
+- **Accent:** `#FFE66D → #FFC947` (Gold gradient)
+- **Streak Fire:** `linear-gradient(135deg, #FF6B6B, #FFE66D)`
+- **Level Up:** `linear-gradient(135deg, #4ECDC4, #556270)`
 
-**Neutral Colors:**
-- **Background:** `#F7F9FC` (Light gray-blue)
-- **Surface:** `#FFFFFF` (White)
-- **Text Primary:** `#2D3748` (Dark gray)
-- **Text Secondary:** `#718096` (Medium gray)
+**Surface Colors (Light Mode):**
+- **Background:** `#F0F4F8`
+- **Surface:** `rgba(255, 255, 255, 0.72)` — frosted glass
+- **Elevated:** `rgba(255, 255, 255, 0.90)`
+- **Card:** `rgba(255, 255, 255, 0.60)` — glassmorphism
+
+**Surface Colors (Dark Mode):**
+- **Background:** `#0F172A`
+- **Surface:** `rgba(30, 41, 59, 0.72)`
+- **Elevated:** `rgba(30, 46, 67, 0.85)`
+- **Card:** `rgba(30, 41, 59, 0.55)`
+
+**Text Colors:**
+- **Primary:** `#1A202C` / Dark: `#F1F5F9`
+- **Secondary:** `#718096` / Dark: `#94A3B8`
+- **Muted:** `#A0AEC0` / Dark: `#64748B`
 
 **Semantic Colors:**
-- **Success:** `#48BB78` (Green)
-- **Warning:** `#ECC94B` (Yellow)
-- **Error:** `#F56565` (Red)
-- **Info:** `#4299E1` (Blue)
+- **Success:** `#34D399`
+- **Warning:** `#FBBF24`
+- **Error:** `#F87171`
+- **Info:** `#60A5FA`
 
-**Gradient:**
-- **Streak Fire:** `linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%)`
-- **Level Up:** `linear-gradient(135deg, #4ECDC4 0%, #556270 100%)`
+#### Glassmorphism Tokens
+```css
+--glass-bg: rgba(255, 255, 255, 0.60);
+--glass-border: 1px solid rgba(255, 255, 255, 0.18);
+--glass-blur: backdrop-filter: blur(20px) saturate(180%);
+--glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+--glass-radius: 24px;
+```
 
 #### Typography
-- **Font Family:** Inter (primary), SF Pro (iOS native), Roboto (Android native)
-- **Headings:**
-  - H1: 32px, Bold
-  - H2: 24px, Semibold
-  - H3: 20px, Medium
-- **Body:**
-  - Large: 18px, Regular
-  - Medium: 16px, Regular
-  - Small: 14px, Regular
-- **CTA Buttons:** 16px, Semibold
+- **Font Family:** Outfit (primary, Google Fonts), SF Pro (iOS), Roboto (Android)
+- **Display:** 40px Black, letter-spacing: -1.5px
+- **H1:** 32px Bold, letter-spacing: -1px
+- **H2:** 24px Semibold, letter-spacing: -0.5px
+- **H3:** 20px Medium
+- **Body:** 16px Regular, line-height: 1.6
+- **Caption:** 13px Medium, letter-spacing: 0.2px
+- **CTA Buttons:** 16px Semibold
 
 #### Spacing
 - **Base Unit:** 4px
-- **Common Spacings:** 8px, 12px, 16px, 24px, 32px, 48px
-- **Container Padding:** 16px (mobile), 24px (tablet)
+- **Common Spacings:** 8px, 12px, 16px, 20px, 24px, 32px, 48px
+- **Container Padding:** 20px (mobile), 24px (tablet)
+- **Card Padding:** 24px
 
 #### Border Radius
-- **Small:** 8px (buttons, inputs)
-- **Medium:** 12px (cards)
-- **Large:** 16px (modals, sheets)
+- **Small:** 12px (buttons, inputs)
+- **Medium:** 20px (cards)
+- **Large:** 24px (modals, sheets)
+- **Pill:** 999px (pill buttons, toggles)
 - **Circular:** 50% (avatars, badges)
 
-#### Shadows
-- **Light:** `0 2px 4px rgba(0,0,0,0.05)`
-- **Medium:** `0 4px 12px rgba(0,0,0,0.08)`
-- **Strong:** `0 8px 24px rgba(0,0,0,0.12)`
+#### Elevation System
+| Level | Blur | Shadow | Use |
+|-------|------|--------|-----|
+| 0 | 0 | none | Flat surfaces |
+| 1 | 8px | `0 4px 12px rgba(0,0,0,0.06)` | Resting cards |
+| 2 | 16px | `0 8px 24px rgba(0,0,0,0.10)` | Elevated / selected state |
+| 3 | 24px | `0 16px 48px rgba(0,0,0,0.14)` | Modals, bottom sheets |
 
 ---
 
-### 10.2 Animation Guidelines
+### 10.2 Gesture & Interaction System
 
-#### Transition Timing
-- **Fast:** 150ms (micro-interactions, hovers)
-- **Normal:** 300ms (screen transitions, card reveals)
-- **Slow:** 500ms (celebration animations, level ups)
+#### Touch Gestures
+| Gesture | Action | Feedback |
+|---------|--------|----------|
+| **Tap** | Primary action | Scale 0.96→1.0 (spring), subtle haptic |
+| **Long Press** (300ms) | Context menu / reorder | Haptic (medium), scale 1.02, shadow lift |
+| **Swipe Right** | Go back / dismiss | Parallax page slide, velocity-based |
+| **Swipe Down** | Dismiss bottom sheet/modal | Spring-damped with overscroll rubberband |
+| **Swipe Left on Card** | Quick delete / archive | Red reveal layer, icon slide-in |
+| **Pull Down** | Refresh | Custom Lottie spinner, overscroll bounce |
 
-#### Easing Functions
-- **Standard:** `cubic-bezier(0.4, 0.0, 0.2, 1)` (Material Design standard)
-- **Decelerate:** `cubic-bezier(0.0, 0.0, 0.2, 1)` (exiting animations)
-- **Accelerate:** `cubic-bezier(0.4, 0.0, 1, 1)` (entering animations)
-- **Spring:** Use for delightful bounces (card entrances, button presses)
+#### Haptic Feedback Map
+- **Light:** Button taps, slider moves, toggle flips
+- **Medium:** Long press trigger, card drag start, deletion
+- **Heavy:** Level up, badge unlock, streak milestone
+- **Success:** Action completed, sugar logged
+- **Warning:** Streak about to break
+- **Error:** Failed validation, connection error
+
+---
+
+### 10.3 Animation Guidelines
+
+#### Spring Physics (Framer Motion)
+| Preset | Stiffness | Damping | Use |
+|--------|-----------|---------|-----|
+| **Bouncy** | 400 | 25 | Button presses, card entrances |
+| **Gentle** | 200 | 20 | Page transitions, reveals |
+| **Snappy** | 600 | 30 | Tab switches, toggles |
+| **Wobbly** | 150 | 12 | Celebrations, character entrance |
 
 #### Key Animations
-1. **Log Success:** Confetti + scale-up XP text (500ms)
-2. **Badge Unlock:** Slide up + shimmer effect (800ms)
-3. **Streak Increment:** Flame grows + pulse (300ms)
-4. **Level Up:** Full-screen explosion + sound (1200ms)
-5. **Button Press:** Scale down 0.95 + haptic (150ms)
+1. **Log Success:** Full-screen confetti + spring-scaled XP counter (800ms) + particle burst
+2. **Badge Unlock:** 3D card flip (rotateY 0→360) + shimmer sweep (1.5s)
+3. **Streak Increment:** Lottie flame grows, glow pulse (300ms)
+4. **Level Up:** Full-screen radial explosion + sound (1200ms)
+5. **Button Press:** Scale 0.96, 3D tilt toward touch point, spring release with overshoot
+6. **Page Transitions:** Slide with parallax (bg 0.3x, content 1x) + spring physics (350ms)
+
+#### Micro-Interactions
+- **Input focus:** Border glow (gradient) + label floats up (spring)
+- **Error shake:** translateX [0, -8, 8, -6, 6, -3, 3, 0] (500ms)
+- **Number change:** Old digit exits up/fade, new enters from bottom/fade
+- **Toggle switch:** Thumb slides with spring, track morphs color (200ms)
+- **Skeleton loading:** Diagonal shimmer sweep (1.5s loop)
+- **Card hover:** 3D tilt toward cursor (max ±5°) + shadow shift
 
 ---
 
-### 10.3 Accessibility
+### 10.4 Accessibility
 
 #### WCAG 2.1 Compliance (Level AA)
 - **Color Contrast:** Minimum 4.5:1 for text, 3:1 for UI components
-- **Touch Targets:** Minimum 44x44px for all interactive elements
-- **Screen Reader Support:** Semantic HTML/ native components, proper labels
-- **Keyboard Navigation:** Full keyboard support (web version)
-- **Motion Reduction:** Respect `prefers-reduced-motion` setting
+- **Touch Targets:** Minimum 48×48px for all interactive elements
+- **Screen Reader Support:** Semantic HTML, `aria-label` on all interactive elements
+- **Keyboard Navigation:** Full keyboard support, visible 3px focus rings
+- **Motion Reduction:** Respect `prefers-reduced-motion` — disables all springs/particles, uses 200ms fades
+- **High Contrast Mode:** Solid backgrounds replace glassmorphism
 
 #### Inclusive Design
+- **Dark Mode:** Automatic via `prefers-color-scheme`, manual toggle in settings
 - **Gender Options:** Male, Female, Other, Prefer not to say
 - **Language Support:** English (MVP), Hindi (Phase 2)
 - **Offline Support:** Full functionality without internet
-- **Low-Data Mode:** Option to disable animations
+- **Low-Data Mode:** Option to disable animations and Lottie files
 
 ---
 

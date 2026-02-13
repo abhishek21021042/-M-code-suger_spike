@@ -1,26 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-base: #12121A;
+  --bg-neu-light: #1C1C28;
+  --bg-neu-dark: #0D0D14;
+  --foreground: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.55);
+
+  --brand-coral: #ff6b6b;
+  --brand-coral-dark: #ec4899;
+  --brand-teal: #4ECDC4;
+  --brand-teal-dark: #0d9488;
+  --brand-teal-light: #6ee7d7;
+  --brand-gold: #facc15;
+
+  --sugar-low: #4ade80;
+  --sugar-mid: #fbbf24;
+  --sugar-high: #f87171;
+
+  --glass-surface: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.06);
+
+  --shadow-neu-pressed: inset 4px 4px 8px #0a0a10, inset -4px -4px 8px #1e1e2a;
+  --shadow-neu-flat: 6px 6px 16px #0a0a10, -6px -6px 16px #1e1e2a;
+}
+
+[data-theme='light'] {
+  --bg-base: #EEF2F6;
+  --bg-neu-light: #FFFFFF;
+  --bg-neu-dark: #D1D9E6;
+  --foreground: #2D3748;
+  --text-secondary: #718096;
+
+  --glass-surface: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.2);
+
+  --shadow-neu-pressed: inset 6px 6px 12px #D1D9E6, inset -6px -6px 12px #FFFFFF;
+  --shadow-neu-flat: 8px 8px 16px #D1D9E6, -8px -8px 16px #FFFFFF;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg-base: var(--bg-base);
+  --color-bg-neu-light: var(--bg-neu-light);
+  --color-bg-neu-dark: var(--bg-neu-dark);
+  --color-brand-coral: var(--brand-coral);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-teal-light: var(--brand-teal-light);
+  --color-sugar-low: var(--sugar-low);
+  --color-sugar-mid: var(--sugar-mid);
+  --color-sugar-high: var(--sugar-high);
+  --shadow-neu-pressed: var(--shadow-neu-pressed);
+  --shadow-neu-flat: var(--shadow-neu-flat);
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
+  background: var(--bg-base);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar hide */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mesh gradient animation */
+@keyframes meshFloat1 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -20px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 15px) scale(0.95);
+  }
+}
+
+@keyframes meshFloat2 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(-25px, 25px) scale(1.05);
+  }
+
+  66% {
+    transform: translate(35px, -15px) scale(1.1);
+  }
+}
+
+@keyframes meshFloat3 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(15px, 30px) scale(0.9);
+  }
+
+  66% {
+    transform: translate(-30px, -20px) scale(1.15);
+  }
+}
+
+/* Logo ring rotation */
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse glow */
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(255, 107, 107, 0.6);
+  }
+}
+
+/* Button float */
+@keyframes floatY {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Shimmer sweep for XP bars */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* Badge bob */
+@keyframes bob {
+
+  0%,
+  100% {
+    transform: rotate(12deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(12deg) translateY(-4px);
+  }
+}
+
+/* HP badge bob */
+@keyframes bobHP {
+
+  0%,
+  100% {
+    transform: rotate(-6deg) scale(0.9) translateY(0);
+  }
+
+  50% {
+    transform: rotate(-6deg) scale(0.9) translateY(-3px);
+  }
+}
+
+/* Stagger fade-in */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress bar stripes */
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 1rem 0;
+  }
+
+  to {
+    background-position: 0 0;
+  }
+}
+
+/* Ambient blob drift */
+@keyframes blobDrift {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(20px, -30px) scale(1.05);
+  }
+
+  50% {
+    transform: translate(-10px, 20px) scale(0.95);
+  }
+
+  75% {
+    transform: translate(15px, 10px) scale(1.02);
+  }
+}
+
+/* Gradient border animation */
+@keyframes gradientBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
