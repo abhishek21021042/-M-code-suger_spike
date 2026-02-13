@@ -2,6 +2,8 @@
 
 **Beat the Sugar Spike** is a gamified Progressive Web App (PWA) designed to help users track and reduce their sugar intake. It combines frictionless logging with real-time, context-aware insights to improve metabolic health awareness.
 
+> **[View Live Demo](https://majestic-fudge-011560.netlify.app/)**
+
 ## Features
 
 -   **Speed Logging:** Log sugar intake in under 10 seconds with presets.
