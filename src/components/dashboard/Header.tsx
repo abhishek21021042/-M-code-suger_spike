@@ -8,7 +8,11 @@ import VoiceLogger from './inputs/VoiceLogger';
 import PhotoLogger from './inputs/PhotoLogger';
 import WeeklyReport from './WeeklyReport';
 
-export default function Header() {
+type HeaderProps = {
+    hideXPBar?: boolean;
+};
+
+export default function Header({ hideXPBar = false }: HeaderProps) {
     const { xp, streak, level, theme, toggleTheme, setOverlayActive } = useOnboardingStore();
     const [showVoice, setShowVoice] = useState(false);
     const [showPhoto, setShowPhoto] = useState(false);
@@ -83,37 +87,39 @@ export default function Header() {
                 </button>
             </div>
 
-            {/* NEW XP / Level Card */}
-            <GlassCard className="p-4 relative overflow-hidden bg-gradient-to-br from-brand-teal/10 to-transparent border-brand-teal/20">
-                <div className="flex justify-between items-end mb-3 relative z-10">
-                    <div>
-                        <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-0.5">Current Level</div>
-                        <div className="text-3xl font-black italic tracking-tight text-white flex items-baseline gap-1">
-                            <span className="text-lg opacity-50 not-italic font-bold">LVL</span>
-                            {level}
+            {/* XP / Level Card - Hidden if hideXPBar is true */}
+            {!hideXPBar && (
+                <GlassCard className="p-4 relative overflow-hidden bg-gradient-to-br from-brand-teal/10 to-transparent border-brand-teal/20">
+                    <div className="flex justify-between items-end mb-3 relative z-10">
+                        <div>
+                            <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-0.5">Current Level</div>
+                            <div className="text-3xl font-black italic tracking-tight text-white flex items-baseline gap-1">
+                                <span className="text-lg opacity-50 not-italic font-bold">LVL</span>
+                                {level}
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-xs font-bold text-white/50 mb-0.5">
+                                <span className="text-white">{xp}</span> <span className="opacity-50">/ {level * 500} XP</span>
+                            </div>
+                            <div className="text-[10px] font-bold text-brand-teal italic">
+                                {(level * 500) - xp} XP to next
+                            </div>
                         </div>
                     </div>
-                    <div className="text-right">
-                        <div className="text-xs font-bold text-white/50 mb-0.5">
-                            <span className="text-white">{xp}</span> <span className="opacity-50">/ {level * 500} XP</span>
-                        </div>
-                        <div className="text-[10px] font-bold text-brand-teal italic">
-                            {(level * 500) - xp} XP to next
-                        </div>
-                    </div>
-                </div>
 
-                <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden relative z-10">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.min(100, ((xp % 500) / 500) * 100)}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className="h-full bg-brand-teal rounded-full relative"
-                    >
-                        <div className="absolute inset-0 bg-white/20" style={{ animation: 'shimmer 2s infinite linear' }} />
-                    </motion.div>
-                </div>
-            </GlassCard>
+                    <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden relative z-10">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(100, ((xp % 500) / 500) * 100)}%` }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                            className="h-full bg-brand-teal rounded-full relative"
+                        >
+                            <div className="absolute inset-0 bg-white/20" style={{ animation: 'shimmer 2s infinite linear' }} />
+                        </motion.div>
+                    </div>
+                </GlassCard>
+            )}
         </motion.div>
     );
 }

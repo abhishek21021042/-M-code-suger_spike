@@ -18,29 +18,7 @@ export default function ProfilePage() {
             <Header hideXPBar={true} />
 
             <div className="mt-8 space-y-6 pb-24">
-                {/* Level & XP Card */}
-                <GlassCard className="p-6 bg-gradient-to-br from-brand-teal/10 to-transparent border-brand-teal/20">
-                    <div className="flex justify-between items-end mb-4">
-                        <div>
-                            <p className="text-white/40 text-xs uppercase font-bold tracking-wider mb-1">Current Level</p>
-                            <h2 className="text-4xl font-black text-white italic">LVL {level}</h2>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-white/40 text-xs font-bold mb-1">{xp} / {nextLevelXP} XP</p>
-                            <p className="text-brand-teal text-xs font-bold italic">{(nextLevelXP - (xp % nextLevelXP))} XP to next</p>
-                        </div>
-                    </div>
 
-                    {/* XP Progress Bar */}
-                    <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[2px]">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progress}%` }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                            className="h-full bg-gradient-to-r from-brand-teal to-brand-teal-light rounded-full shadow-[0_0_10px_rgba(45,212,191,0.5)]"
-                        />
-                    </div>
-                </GlassCard>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 gap-4">
